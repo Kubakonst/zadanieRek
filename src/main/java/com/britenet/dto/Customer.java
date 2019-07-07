@@ -1,22 +1,19 @@
-package DTO;
+package com.britenet.dto;
 
-public class Costumer {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Customer {
 
     private String city;
     private String name;
     private String surname;
     private String age;
     private int id;
+    private List<Contact> contacts;
 
-    public Costumer() {
-    }
-
-    public Costumer(String city, String name, String surname, String age, int id) {
-        this.city = city;
-        this.name = name;
-        this.surname = surname;
-        this.age = age;
-        this.id = id;
+    public Customer() {
+        contacts = new ArrayList<>();
     }
 
     public String getCity() {
@@ -58,4 +55,9 @@ public class Costumer {
     public void setId(int id) {
         this.id = id;
     }
+
+    public List<Contact> getContacts() {
+        return contacts;
+    }
+
 }

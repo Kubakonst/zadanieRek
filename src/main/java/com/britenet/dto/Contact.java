@@ -1,16 +1,16 @@
-package DTO;
+package com.britenet.dto;
 
 public class Contact {
 
     private String id;
-    private Costumer customer;
+    private Customer customer;
     private int type;
     private String contact;
 
     public Contact() {
     }
 
-    public Contact(String id, Costumer customer, int type, String contact) {
+    public Contact(String id, Customer customer, int type, String contact) {
         this.id = id;
         this.customer = customer;
         this.type = type;
@@ -25,11 +25,11 @@ public class Contact {
         this.id = id;
     }
 
-    public Costumer getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Costumer customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
