@@ -1,0 +1,3 @@
+jdbc:mysql://localhost/zadanie?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+root
+h2vxs5xj
