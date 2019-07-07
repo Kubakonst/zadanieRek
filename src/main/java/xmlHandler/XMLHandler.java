@@ -16,6 +16,7 @@ public class XMLHandler extends DefaultHandler {
     Costumer customer = null;
     Contact contact = null;
     String content = null;
+    int i = 0;
     @Override
     public void startElement(String uri, String localName,
                              String qName, Attributes attributes)
@@ -25,6 +26,8 @@ public class XMLHandler extends DefaultHandler {
             //Create a new Employee object when the start tag is found
             case "person":
                 customer = new Costumer();
+                customer.setId(i);
+                i=i+1;
                 break;
         }
     }

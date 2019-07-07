@@ -8,11 +8,16 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScannerClass {
+
+    static final String DB_URL = "jdbc:mysql://localhost/zadanie?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    static final String USER = "root";
+    static final String PASS = "h2vxs5xj";
 
     public ScannerClass() {
         String s;
@@ -65,10 +70,10 @@ public class ScannerClass {
                 customer.setCity(customerDetails[3]);
                 for (int i = 4; customerDetails.length > i; i++) {
                     Contact contact = new Contact();
-                    if (isEmail(customerDetails[i])) {
-                        contact.setType(2);
-                    } else if (isPhone(customerDetails[i])) {
+                    if (isPhone(customerDetails[i])) {
                         contact.setType(1);
+                    } else if (isEmail(customerDetails[i])) {
+                        contact.setType(2);
                     } else {
                         contact.setType(0);
                     }
@@ -86,16 +91,19 @@ public class ScannerClass {
         SAXParser parser = parserFactor.newSAXParser();
         XMLHandler handler = new XMLHandler();
         parser.parse(inputStream, handler);
-        System.out.println("kumitsu xml");
         for (Costumer emp : handler.getCustomerList()){
-            System.out.println(emp);
+            saveCustomer(emp);
+            System.out.println(emp.getId());
+        }
+        for (Contact emp : handler.getContactsList()){
+            saveContact(emp);
         }
     }
 
     public static boolean isPhone(String phone) {
         Pattern p = Pattern.compile("(?:\\(\\d{3}\\)|\\d{3}[-]*)\\d{3}[-]*\\d{4}");
-        Matcher m = p.matcher(phone);
-        return (m.find() && m.group().equals(phone));
+//        Matcher m = p.matcher(phone);
+        return p.matcher(phone).matches();
     }
 
     public static boolean isEmail(String email) {
@@ -103,6 +111,82 @@ public class ScannerClass {
         Pattern p = java.util.regex.Pattern.compile(ePattern);
         Matcher m = p.matcher(email);
         return m.matches();
+    }
+
+    public void saveCustomer(Costumer emp) {
+                Connection conn = null;
+                Statement stmt = null;
+                try{
+                    System.out.println("Connecting to database...");
+                    conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                    stmt = conn.createStatement();
+                    PreparedStatement pstmt = conn.prepareStatement("INSERT INTO customers(NAME, SURNAME, Age) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                    // set input parameters
+                    pstmt.setString(1, emp.getName());
+                    pstmt.setString(2, emp.getSurname());
+                    pstmt.setString(3, emp.getAge());
+                    pstmt.executeUpdate();
+
+                    ResultSet rs = pstmt.getGeneratedKeys();
+                    if (rs.next()) {
+                        int newId = rs.getInt(1);
+                        emp.setId(newId);
+                    }
+
+                    pstmt.close();
+                }catch(SQLException se){
+                    se.printStackTrace();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }finally{
+                    try{
+                        if(stmt!=null)
+                            stmt.close();
+                    }catch(SQLException se2){
+                    }
+                    try{
+                        if(conn!=null)
+                            conn.close();
+                    }catch(SQLException se){
+                        se.printStackTrace();
+                    }
+                }
+                System.out.println("Goodbye!");
+            }
+
+    public void saveContact(Contact emp) {
+        Connection conn = null;
+        Statement stmt = null;
+        try{
+            System.out.println("Connecting to database...");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO contacts(ID_CUSTOMER, TYPE, CONTACT) VALUES (?, ?, ?)");
+            // set input parameters
+            pstmt.setInt(1, emp.getCustomer().getId());
+            pstmt.setInt(2, emp.getType());
+            pstmt.setString(3, emp.getContact());
+            pstmt.executeUpdate();
+
+            pstmt.close();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            try{
+                if(stmt!=null)
+                    stmt.close();
+            }catch(SQLException se2){
+            }
+            try{
+                if(conn!=null)
+                    conn.close();
+            }catch(SQLException se){
+                se.printStackTrace();
+            }
+        }
+        System.out.println("Goodbye!");
     }
 
 //    public Boolean checkIfUserExists(String user) throws XMPPException{
